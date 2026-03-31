@@ -403,7 +403,8 @@ func PreCheckStreamConnectionAzureBlobStorage(tb testing.TB) {
 	tb.Helper()
 	PreCheckBasic(tb)
 	if os.Getenv("AZURE_SERVICE_PRINCIPAL_ID") == "" ||
-		os.Getenv("AZURE_BLOB_STORAGE_ACCOUNT_NAME") == "" {
+		os.Getenv("AZURE_BLOB_STORAGE_ACCOUNT_NAME") == "" ||
+		os.Getenv("AZURE_REGION") == "" {
 		tb.Fatal("`AZURE_SERVICE_PRINCIPAL_ID` and `AZURE_BLOB_STORAGE_ACCOUNT_NAME` must be set for Azure Blob Storage stream connection acceptance testing")
 	}
 }
