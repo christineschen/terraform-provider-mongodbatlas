@@ -12,6 +12,12 @@ schema:
                 allowed:
                     - api_name: aws
                       tf_schema_name: aws
+            AzureBlobStorage:
+                allowed:
+                    - api_name: azure
+                      tf_schema_name: azure
+                    - api_name: publicPrivateNetworking
+                      tf_schema_name: networking
             Cluster:
                 allowed:
                     - api_name: clusterName
@@ -255,6 +261,57 @@ schema:
           create_only: false
           present_in_any_response: true
           request_only_required_on_create: false
+        - single_nested:
+            nested_object:
+                attributes:
+                    - string: {}
+                      description: UUID that identifies the Azure Service Principal used to access the Azure Blob Storage account.
+                      computed_optional_required: required
+                      tf_schema_name: service_principal_id
+                      tf_model_name: ServicePrincipalId
+                      api_name: servicePrincipalId
+                      req_body_usage: all_request_bodies
+                      sensitive: false
+                      create_only: false
+                      present_in_any_response: true
+                      request_only_required_on_create: false
+                    - string: {}
+                      description: Name of the Azure Storage account to use. Must be lowercase, 3-24 characters, and contain only letters and numbers.
+                      computed_optional_required: required
+                      tf_schema_name: storage_account_name
+                      tf_model_name: StorageAccountName
+                      api_name: storageAccountName
+                      req_body_usage: all_request_bodies
+                      sensitive: false
+                      create_only: false
+                      present_in_any_response: true
+                      request_only_required_on_create: false
+                    - string: {}
+                      description: Azure region where the storage account is located.
+                      computed_optional_required: computed_optional
+                      tf_schema_name: region
+                      tf_model_name: Region
+                      api_name: region
+                      req_body_usage: all_request_bodies
+                      sensitive: false
+                      create_only: false
+                      present_in_any_response: true
+                      request_only_required_on_create: false
+          description: 'Optional for type: AzureBlobStorage. Azure configurations for Azure Blob Storage connection types.'
+          custom_type:
+            package: customtypes
+            name: Azure
+            model: customtypes.ObjectValue[TFAzureModel]
+            schema: customtypes.NewObjectType[TFAzureModel](ctx)
+          computed_optional_required: optional
+          tf_schema_name: azure
+          tf_model_name: Azure
+          api_name: azure
+          req_body_usage: all_request_bodies
+          sensitive: false
+          create_only: false
+          present_in_any_response: true
+          request_only_required_on_create: false
         - string: {}
           description: 'Optional for type: Kafka. Comma separated list of server addresses.'
           computed_optional_required: optional
@@ -447,7 +504,7 @@ schema:
                       create_only: false
                       present_in_any_response: true
                       request_only_required_on_create: false
-          description: 'Optional for type: AWSKinesisDataStreams, Kafka, S3. Networking configuration for Streams connections.'
+          description: 'Optional for type: AWSKinesisDataStreams, AzureBlobStorage, Kafka, S3. Networking configuration for Streams connections.'
           custom_type:
             package: customtypes
             name: Networking

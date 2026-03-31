@@ -91,6 +91,26 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"azure": schema.SingleNestedAttribute{
+				Optional:            true,
+				MarkdownDescription: "Optional for type: AzureBlobStorage. Azure configurations for Azure Blob Storage connection types.",
+				CustomType:          customtypes.NewObjectType[TFAzureModel](ctx),
+				Attributes: map[string]schema.Attribute{
+					"service_principal_id": schema.StringAttribute{
+						Required:            true,
+						MarkdownDescription: "UUID that identifies the Azure Service Principal used to access the Azure Blob Storage account.",
+					},
+					"storage_account_name": schema.StringAttribute{
+						Required:            true,
+						MarkdownDescription: "Name of the Azure Storage account to use. Must be lowercase, 3-24 characters, and contain only letters and numbers.",
+					},
+					"region": schema.StringAttribute{
+						Computed:            true,
+						Optional:            true,
+						MarkdownDescription: "Azure region where the storage account is located.",
+					},
+				},
+			},
 			"bootstrap_servers": schema.StringAttribute{
 				Optional:            true,
 				MarkdownDescription: "Optional for type: Kafka. Comma separated list of server addresses.",
@@ -141,7 +161,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"networking": schema.SingleNestedAttribute{
 				Optional:            true,
-				MarkdownDescription: "Optional for type: AWSKinesisDataStreams, Kafka, S3. Networking configuration for Streams connections.",
+				MarkdownDescription: "Optional for type: AWSKinesisDataStreams, AzureBlobStorage, Kafka, S3. Networking configuration for Streams connections.",
 				CustomType:          customtypes.NewObjectType[TFNetworkingModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"access": schema.SingleNestedAttribute{
@@ -251,6 +271,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"AWSLambda": {
 								Allowed: []string{"aws"},
 							},
+							"AzureBlobStorage": {
+								Allowed: []string{"azure", "networking"},
+							},
 							"Cluster": {
 								Allowed: []string{"cluster_name", "cluster_project_id", "db_role_to_execute"},
 							},
@@ -295,6 +318,7 @@ type TFModel struct {
 	TFExpandedModel
 	Authentication               customtypes.ObjectValue[TFAuthenticationModel]               `tfsdk:"authentication"`
 	Aws                          customtypes.ObjectValue[TFAwsModel]                          `tfsdk:"aws"`
+	Azure                        customtypes.ObjectValue[TFAzureModel]                        `tfsdk:"azure"`
 	BootstrapServers             types.String                                                 `tfsdk:"bootstrap_servers"`
 	ClusterProjectId             types.String                                                 `tfsdk:"cluster_project_id" apiname:"clusterGroupId"`
 	ClusterName                  types.String                                                 `tfsdk:"cluster_name"`
@@ -333,6 +357,11 @@ type TFAuthenticationModel struct {
 type TFAwsModel struct {
 	RoleArn    types.String `tfsdk:"role_arn"`
 	TestBucket types.String `tfsdk:"test_bucket"`
+}
+type TFAzureModel struct {
+	ServicePrincipalId types.String `tfsdk:"service_principal_id"`
+	StorageAccountName types.String `tfsdk:"storage_account_name"`
+	Region             types.String `tfsdk:"region"`
 }
 type TFDbRoleToExecuteModel struct {
 	Role types.String `tfsdk:"role"`
